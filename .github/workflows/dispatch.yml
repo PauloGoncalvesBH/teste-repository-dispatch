@@ -1,23 +1,13 @@
-name: Continuous Delivery
-
+name: Repository Dispatch
 on:
-  workflow_dispatch:
-  push:
-
-env:
-  PACT_BROKER_BASE_URL: https://paulogoncalves.pactflow.io
-  PACT_BROKER_TOKEN: ${{ secrets.PACT_BROKER_TOKEN }}
-  COMMIT: ${{ github.sha }}
-  BRANCH: ${{ github.ref }}
-
+  # pull_request:
+  repository_dispatch:
+    types: [consumer-dispatch]
 jobs:
-  dispatch:
-    runs-on: ubuntu-18.04
+  myEvent:
+    runs-on: ubuntu-latest
     steps:
-    - name: Repository Dispatch
-      uses: peter-evans/repository-dispatch@v1
-      with:
-        token: ${{ secrets.DISPATCH_ACCESS_TOKEN }}
-        repository: ServeRest/ServeRest
-        event-type: consumer-dispatch
-        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.client_payload.ref }}
+      - run: echo ${{ github.event.client_payload.sha }}
