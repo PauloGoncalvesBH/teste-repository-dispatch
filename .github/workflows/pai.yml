@@ -1,0 +1,44 @@
+name: Quebra e trigga o dispatch
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  baixa-codigo:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Project checkout
+      uses: actions/checkout@v2
+
+  quebra-ci:
+    runs-on: ubuntu-18.04
+    steps:
+    # - name: Project checkout
+    #   uses: actions/checkout@v2
+    # - run: exit 1
+    - name: Dispatch repository_dispatch event
+      # if: failure()
+      uses: peter-evans/repository-dispatch@v1
+      with:
+        token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        event-type: dispatch-message
+        client-payload: '{"url": "https:${{github.repository}}/${{github.run_id}}", "job_name": "${{github.job}}"}'
+
+  # trigga-dispatch:
+  #   runs-on: ubuntu-18.04
+  #   needs: [baixa-codigo, quebra-ci]
+  #   if: needs.baixa-codigo.result == 'failure' || needs.quebra-ci.result == 'failure'
+  #   steps:
+  #   - name: Dispatch workflow_dispatch event
+  #     uses: ph-fritsche/action-dispatch@v1
+  #     with:
+  #       token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+  #       type: dispatch-message
+  #       ident: dispatch.yml 
+  #       payload: |
+  #         '{
+  #           "url":"https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}",
+  #           "alf":"o eteimoso",
+  #           "jobId": ""
+  #         }'
